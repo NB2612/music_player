@@ -30,7 +30,7 @@
 ```
 AudioPlayer/
 │
-├─ main.py               # Главный скрипт
+├─ AudioPlayer.py               # Главный скрипт
 ├─ main/                 # Пакет с модулями
 │   ├─ __init__.py
 │   ├─ composition.py
@@ -109,7 +109,7 @@ pyinstaller --onefile --windowed main.py --icon=myicon.ico
 3. После сборки exe появится в папке `dist/`:
 
 ```
-dist/main.exe
+dist/AudioPlayer.exe
 ```
 
 ---
