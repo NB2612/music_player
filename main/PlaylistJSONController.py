@@ -14,7 +14,6 @@ class PlaylistJSONController:
             os.makedirs(self.folder)
 
     def playlist_file(self, name):
-        print(name)
         safe_name = name.replace(" ", "_")
         return os.path.join(self.folder, f"playlist_{safe_name}.json")
 

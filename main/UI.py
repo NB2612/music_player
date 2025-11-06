@@ -78,6 +78,7 @@ class AudioPlayerFrame(wx.Frame):
 
         # Первая строка — кнопки управления
         button_sizer = wx.BoxSizer(wx.HORIZONTAL)
+
         self.btn_prev = wx.Button(panel, label="⏮")
         self.btn_play = wx.Button(panel, label="▶")
         self.btn_pause = wx.Button(panel, label="▶/⏸")
@@ -118,6 +119,7 @@ class AudioPlayerFrame(wx.Frame):
         self.btn_prev.Bind(wx.EVT_BUTTON, self.on_prev)
         self.btn_next.Bind(wx.EVT_BUTTON, self.on_next)
         self.playlist_list.Bind(wx.EVT_LISTBOX, self.on_select_playlist)
+        self.composition_list.Bind(wx.EVT_LISTBOX_DCLICK, self.on_play)
 
         # Подгружаем плейлисты из json
         for name in self.playlists:
@@ -176,9 +178,10 @@ class AudioPlayerFrame(wx.Frame):
 
     def refresh_composition_list(self):
         self.composition_list.Clear()
-        if self.current_playlist:
-            for c in self.current_playlist.get_all_songs():
-                self.composition_list.Append(c.get_title())
+        if not self.current_playlist:
+            return
+        for comp in self.current_playlist.get_all_songs():
+            self.composition_list.Append(comp.get_title())
 
     def on_add_composition(self, event):
         if self.current_playlist is None:
@@ -211,23 +214,35 @@ class AudioPlayerFrame(wx.Frame):
                 if s.get_title() == title:
                     self.current_playlist.remove_song(s)
                     break
-            self.composition_list.Delete(sel)
+            self.composition_list.Delete(sel) # удаляем выбранный элемент
+
 
     def on_move_up(self, event):
         sel = self.composition_list.GetSelection()
-        if sel > 0:
+        if sel != wx.NOT_FOUND and self.current_playlist:
             title = self.composition_list.GetString(sel)
-            self.composition_list.Delete(sel)
-            self.composition_list.Insert(title, sel - 1)
-            self.composition_list.SetSelection(sel - 1)
+            comp = next(c for c in self.current_playlist.get_all_songs() if c.get_title() == title)
+            self.current_playlist.move_up(comp)
+            self.refresh_composition_list()
+            # Обновляем JSON плейлиста
+            self.json_controller.save_playlist(self.playlist_list.GetString(self.playlist_list.GetSelection()),
+                                               self.current_playlist)
+            # Оставляем выделение на перемещенном треке
+            index = max(sel - 1, 0)
+            self.composition_list.SetSelection(index)
 
     def on_move_down(self, event):
         sel = self.composition_list.GetSelection()
-        if sel != wx.NOT_FOUND and sel < self.composition_list.GetCount() - 1:
+        if sel != wx.NOT_FOUND and self.current_playlist:
             title = self.composition_list.GetString(sel)
-            self.composition_list.Delete(sel)
-            self.composition_list.Insert(title, sel + 1)
-            self.composition_list.SetSelection(sel + 1)
+            comp = next(c for c in self.current_playlist.get_all_songs() if c.get_title() == title)
+            self.current_playlist.move_down(comp)
+            self.refresh_composition_list()
+            self.json_controller.save_playlist(self.playlist_list.GetString(self.playlist_list.GetSelection()),
+                                               self.current_playlist)
+            # Оставляем выделение на перемещенном треке
+            index = min(sel + 1, self.composition_list.GetCount() - 1)
+            self.composition_list.SetSelection(index)
 
     # === Кнопки воспроизведения ===
     def on_play(self, event):
