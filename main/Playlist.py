@@ -3,18 +3,43 @@ from .linked_list import LinkedList
 
 
 class PlayList(LinkedList):
+    """
+    Плейлист — кольцевой двусвязный список музыкальных композиций.
+
+    Наследует LinkedList и добавляет логику управления текущей композицией.
+
+    Attributes:
+        current_node (LinkedListItem | None): Узел текущей композиции.
+    """
     def __init__(self):
+        """
+        Инициализация пустого плейлиста.
+        """
         super().__init__(None)
         self.current_node = None
 
     def add_song(self, composition: Composition):
-        """Добавление песни в плейлист"""
+        """
+        Добавляет композицию в плейлист.
+
+        Если плейлист был пустым, текущей композицией становится добавленный трек.
+
+        Args:
+            composition (Composition): Объект композиции для добавления.
+        """
         self.append(composition)
         if self.current_node is None:
             self.current_node = self.first_item
 
     def remove_song(self, composition: Composition):
-        """Удаление композиции из плейлиста с использованием базового remove"""
+        """
+        Удаляет композицию из плейлиста.
+
+        Обновляет current_node, если он указывает на удаляемый узел.
+
+        Args:
+            composition (Composition): Объект композиции для удаления.
+        """
         node_to_remove = self.find_node(composition)
 
         if not node_to_remove:
@@ -34,24 +59,49 @@ class PlayList(LinkedList):
         self.remove(composition)
 
     def next_song(self):
+        """
+        Переключает на следующий трек в плейлисте.
+
+        Returns:
+            Composition | None: Следующая композиция или None, если плейлист пуст.
+        """
         if self.current_node:
             self.current_node = self.current_node.next_item
             return self.current_node.data
         return None
 
     def previous_song(self):
+        """
+        Переключает на предыдущий трек в плейлисте.
+
+        Returns:
+            Composition | None: Предыдущая композиция или None, если плейлист пуст.
+        """
         if self.current_node:
             self.current_node = self.current_node.previous_item
             return self.current_node.data
         return None
 
     def get_current(self):
+        """
+        Возвращает текущую композицию плейлиста.
+
+        Returns:
+            Composition | None: Текущая композиция или None, если плейлист пуст.
+        """
         if self.current_node:
             return self.current_node.data
         return None
 
     def move_up(self, composition: Composition):
-        """Перемещает композицию на одну позицию вверх"""
+        """
+        Перемещает композицию на одну позицию вверх в плейлисте.
+
+        Обменивает данные узлов, не изменяя ссылки.
+
+        Args:
+            composition (Composition): Объект композиции для перемещения.
+        """
         node = self.find_node(composition)
         if node and node.previous_item:
             prev_node = node.previous_item
@@ -61,7 +111,14 @@ class PlayList(LinkedList):
                 self.current_node = node
 
     def move_down(self, composition: Composition):
-        """Перемещает композицию на одну позицию вниз"""
+        """
+        Перемещает композицию на одну позицию вниз в плейлисте.
+
+        Обменивает данные узлов, не изменяя ссылки.
+
+        Args:
+            composition (Composition): Объект композиции для перемещения.
+        """
         node = self.find_node(composition)
         if node and node.next_item:
             next_node = node.next_item
@@ -71,6 +128,15 @@ class PlayList(LinkedList):
                 self.current_node = node
 
     def find_node(self, data):
+        """
+        Ищет узел по данным.
+
+        Args:
+            data (Composition): Данные для поиска.
+
+        Returns:
+            LinkedListItem | None: Узел с соответствующими данными или None, если не найден.
+        """
         current = self.first_item
         if not current:
             return None
@@ -84,4 +150,10 @@ class PlayList(LinkedList):
         return None
 
     def get_all_songs(self):
+        """
+        Возвращает все композиции в плейлисте.
+
+        Returns:
+            list[Composition]: Список всех композиций.
+        """
         return [node.data for node in self]

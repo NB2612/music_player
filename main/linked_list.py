@@ -1,19 +1,36 @@
 class LinkedListItem:
-    """Узел двусвязного списка"""
+    """
+    Узел двусвязного списка.
+
+    Attributes:
+        data: Данные, хранимые в узле.
+        _next_item (LinkedListItem | None): Ссылка на следующий узел.
+        _previous_item (LinkedListItem | None): Ссылка на предыдущий узел.
+    """
     def __init__(self, data=None):
+        """
+        Инициализация узла списка.
+
+        Args:
+            data: Данные для хранения в узле (по умолчанию None).
+        """
         self.data = data
         self._next_item = None
         self._previous_item = None
-        #print(repr(self))
 
     @property
     def next_item(self):
-        """Следующий элемент"""
+        """Возвращает следующий элемент списка (LinkedListItem или None)."""
         return self._next_item
 
     @next_item.setter
     def next_item(self, node):
-        """Сеттер next_item с защитой от бесконечной рекурсии"""
+        """
+        Устанавливает следующий элемент с защитой от бесконечной рекурсии.
+
+        Args:
+            node (LinkedListItem | None): Узел, который станет следующим.
+        """
         self._next_item = node
         # защита от бесконечной рекурсии
         if node is not None and node._previous_item is not self:
@@ -21,38 +38,61 @@ class LinkedListItem:
 
     @property
     def previous_item(self):
-        """Предыдущий элемент"""
+        """Возвращает предыдущий элемент списка (LinkedListItem или None)."""
         return self._previous_item
 
     @previous_item.setter
     def previous_item(self, node):
-        """Сеттер previous_item с защитой от бесконечной рекурсии"""
+        """
+        Устанавливает предыдущий элемент с защитой от бесконечной рекурсии.
+
+        Args:
+            node (LinkedListItem | None): Узел, который станет предыдущим.
+        """
         self._previous_item = node
         if node is not None and node._next_item is not self:
             node._next_item = self
 
     def __repr__(self):
+        """Строковое представление узла для отладки."""
         return f"Node (data={self.data}, _next_item={self._next_item}, _previous_item={self._previous_item})"
 
 
 class LinkedList:
-    """Кольцевой двусвязанный список"""
+    """
+    Кольцевой двусвязный список.
+
+    Attributes:
+        _head (LinkedListItem | None): Первый элемент списка.
+    """
     def __init__(self, first_item=None):
+        """
+        Инициализация списка.
+
+        Args:
+            first_item (LinkedListItem | None): Первый узел списка (по умолчанию None).
+        """
         self._head = first_item
 
     @property
     def first_item(self):
+        """Возвращает первый элемент списка (LinkedListItem или None)."""
         return self._head
 
     @property
     def last(self):
-        """Последний элемент"""
+        """Возвращает последний элемент списка (LinkedListItem или None)."""
         if not self.first_item:
             return None
         return self._head.previous_item
 
     def append_left(self, item):
-        """Добавление слева"""
+        """
+        Добавляет элемент в начало списка.
+
+        Args:
+            item: Данные для нового узла.
+        """
         new_node = LinkedListItem(item)
         if not self._head:
             new_node.next_item = new_node
@@ -68,7 +108,12 @@ class LinkedList:
 
 
     def append_right(self, item):
-        """Добавление справа"""
+        """
+        Добавляет элемент в конец списка.
+
+        Args:
+            item: Данные для нового узла.
+        """
         if not self._head:
             self.append_left(item)
         else:
@@ -80,11 +125,19 @@ class LinkedList:
             self._head.previous_item = new_node
 
     def append(self, item):
-        """Синоним append_right"""
+        """Синоним метода append_right."""
         self.append_right(item)
 
     def remove(self, item):
-        """Удаление"""
+        """
+        Удаляет первый найденный элемент из списка.
+
+        Args:
+            item: Данные для удаления.
+
+        Raises:
+            ValueError: Если список пуст или элемент не найден.
+        """
         if not self.first_item:
             raise ValueError("list is empty")
         current = self.first_item
@@ -104,7 +157,16 @@ class LinkedList:
         raise ValueError("item not found")
 
     def insert(self, previous, item):
-        """Вставка справа"""
+        """
+        Вставляет новый элемент справа от указанного элемента.
+
+        Args:
+            previous: Данные узла, после которого вставляем.
+            item: Данные для нового узла.
+
+        Raises:
+            ValueError: Если список пуст или предыдущий узел не найден.
+        """
         if not self.first_item:
             raise ValueError("list is empty")
         current = self.first_item
@@ -124,7 +186,7 @@ class LinkedList:
 
 
     def __len__(self):
-        """Магический метод выдающий размер списка"""
+        """Возвращает количество элементов в списке."""
         if self.first_item is None:
             return 0
         count = 1
@@ -135,6 +197,7 @@ class LinkedList:
         return count
 
     def __iter__(self):
+        """Итератор по узлам списка (LinkedListItem)."""
         if not self.first_item:
             return
         current = self._head
@@ -145,7 +208,18 @@ class LinkedList:
             current = current.next_item
 
     def __getitem__(self, index):
-        """Доступ по индексу"""
+        """
+        Доступ к элементу по индексу.
+
+        Args:
+            index (int): Индекс элемента (может быть отрицательным).
+
+        Returns:
+            Любые данные, хранящиеся в узле.
+
+        Raises:
+            IndexError: Если индекс вне диапазона.
+        """
         size = len(self)
         if index < 0:
             index += size
@@ -157,13 +231,22 @@ class LinkedList:
         return current.data
 
     def __contains__(self, item):
-        """Поддержка оператора in"""
+        """
+        Проверяет наличие элемента в списке.
+
+        Args:
+            item: Данные для поиска.
+
+        Returns:
+            bool: True, если элемент найден, иначе False.
+        """
         for node in self:
             if node.data == item:
                 return True
         return False
 
     def __reversed__(self):
+        """Итератор по элементам списка в обратном порядке."""
         if not self.first_item:
             return
         current = self.last

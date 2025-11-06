@@ -8,8 +8,33 @@ from .PlayerController import PlayerController
 from .PlaylistJSONController import PlaylistJSONController
 
 class AudioPlayerFrame(wx.Frame):
-    def __init__(self, parent=None, title="🎵 Audio Player", size=(600, 600)):
-        super().__init__(parent, title=title, size=size)
+    """
+    Основное окно аудиоплеера.
+
+    Отображает интерфейс для управления плейлистами и воспроизведением аудиотреков.
+    Позволяет добавлять/удалять плейлисты и композиции, перемещать композиции в плейлисте
+    и управлять воспроизведением (play, pause, stop, next, previous).
+
+    Attributes:
+        controller (PlayerController): Контроллер для управления воспроизведением.
+        playlists (dict): Словарь плейлистов, ключ — имя плейлиста, значение — объект PlayList.
+        current_playlist (PlayList | None): Активный плейлист.
+        json_controller (PlaylistJSONController): Контроллер для работы с JSON-файлами плейлистов.
+        timer (wx.Timer): Таймер для обновления прогресса воспроизведения.
+        playlist_list (wx.ListBox): Список плейлистов в интерфейсе.
+        composition_list (wx.ListBox): Список композиций текущего плейлиста.
+        btn_play, btn_pause, btn_stop, btn_prev, btn_next (wx.Button): Кнопки управления воспроизведением.
+        progress (wx.Gauge): Прогресс-бар для отображения позиции воспроизведения.
+    """
+    def __init__(self, parent=None, title="🎵 Audio Player"):
+        """
+        Инициализация главного окна аудиоплеера.
+
+        Args:
+            parent (wx.Window | None): Родительское окно.
+            title (str): Заголовок окна.
+        """
+        super().__init__(parent, title=title, size=wx.Size(700, 600))
 
 
         self.SetBackgroundColour(wx.Colour(240, 240, 240))
@@ -136,6 +161,13 @@ class AudioPlayerFrame(wx.Frame):
 
     # === Методы интеграции с PlayList и Composition ===
     def on_add_playlist(self, event):
+        """
+        Обработчик кнопки добавления нового плейлиста.
+
+        Открывает диалог для ввода имени плейлиста.
+        Если плейлист с таким именем уже существует, выводит предупреждение.
+        После создания плейлист добавляется в список и сохраняется в JSON.
+        """
         dlg = wx.TextEntryDialog(self, "Введите название нового плейлиста:", "Создать плейлист")
         if dlg.ShowModal() == wx.ID_OK:
             name = dlg.GetValue()
@@ -160,6 +192,11 @@ class AudioPlayerFrame(wx.Frame):
         dlg.Destroy()
 
     def on_delete_playlist(self, event):
+        """
+        Обработчик кнопки удаления выбранного плейлиста.
+
+        Удаляет плейлист из словаря, интерфейса и JSON файла.
+        """
         sel = self.playlist_list.GetSelection()
         if sel != wx.NOT_FOUND:
             name = self.playlist_list.GetString(sel)
@@ -170,6 +207,11 @@ class AudioPlayerFrame(wx.Frame):
             self.json_controller.delete_playlist_file(name)
 
     def on_select_playlist(self, event):
+        """
+        Обработчик выбора плейлиста в интерфейсе.
+
+        Обновляет текущий плейлист и список композиций.
+        """
         sel = event.GetSelection()
         if sel != wx.NOT_FOUND:
             name = self.playlist_list.GetString(sel)
@@ -177,6 +219,9 @@ class AudioPlayerFrame(wx.Frame):
             self.refresh_composition_list()
 
     def refresh_composition_list(self):
+        """
+        Обновляет список композиций в интерфейсе для текущего плейлиста.
+        """
         self.composition_list.Clear()
         if not self.current_playlist:
             return
@@ -184,6 +229,13 @@ class AudioPlayerFrame(wx.Frame):
             self.composition_list.Append(comp.get_title())
 
     def on_add_composition(self, event):
+        """
+        Обработчик кнопки добавления композиции.
+
+        Открывает файловый диалог для выбора аудиофайла.
+        Проверяет дубли по имени трека.
+        Добавляет композицию в текущий плейлист и обновляет JSON.
+        """
         if self.current_playlist is None:
             wx.MessageBox("Выберите плейлист!", "Ошибка", wx.OK | wx.ICON_WARNING)
             return
@@ -207,6 +259,9 @@ class AudioPlayerFrame(wx.Frame):
 
 
     def on_delete_composition(self, event):
+        """
+        Обработчик кнопки удаления выбранной композиции из текущего плейлиста.
+        """
         sel = self.composition_list.GetSelection()
         if sel != wx.NOT_FOUND and self.current_playlist:
             title = self.composition_list.GetString(sel)
@@ -218,6 +273,9 @@ class AudioPlayerFrame(wx.Frame):
 
 
     def on_move_up(self, event):
+        """
+        Перемещает выбранную композицию вверх в текущем плейлисте.
+        """
         sel = self.composition_list.GetSelection()
         if sel != wx.NOT_FOUND and self.current_playlist:
             title = self.composition_list.GetString(sel)
@@ -232,6 +290,9 @@ class AudioPlayerFrame(wx.Frame):
             self.composition_list.SetSelection(index)
 
     def on_move_down(self, event):
+        """
+        Перемещает выбранную композицию вниз в текущем плейлисте.
+        """
         sel = self.composition_list.GetSelection()
         if sel != wx.NOT_FOUND and self.current_playlist:
             title = self.composition_list.GetString(sel)
@@ -246,6 +307,9 @@ class AudioPlayerFrame(wx.Frame):
 
     # === Кнопки воспроизведения ===
     def on_play(self, event):
+        """
+        Начинает воспроизведение выбранной композиции или первой композиции плейлиста.
+        """
         if not self.current_playlist or not self.current_playlist.first_item:
             wx.MessageBox("Выберите плейлист с композициями!", "Ошибка", wx.OK | wx.ICON_WARNING)
             return
@@ -268,12 +332,21 @@ class AudioPlayerFrame(wx.Frame):
                     break
 
     def on_pause(self, event):
+        """
+        Приостанавливает или возобновляет воспроизведение текущей композиции.
+        """
         self.controller.pause()
 
     def on_stop(self, event):
+        """
+        Останавливает воспроизведение текущей композиции.
+        """
         self.controller.stop()
 
     def on_prev(self, event):
+        """
+        Переключает на предыдущую композицию в текущем плейлисте.
+        """
         if not self.current_playlist or not self.current_playlist.first_item:
             return
 
@@ -292,6 +365,9 @@ class AudioPlayerFrame(wx.Frame):
         self.composition_list.SetSelection(index)
 
     def on_next(self, event):
+        """
+        Переключает на следующую композицию в текущем плейлисте.
+        """
         if not self.current_playlist or not self.current_playlist.first_item:
             return
 
@@ -311,6 +387,10 @@ class AudioPlayerFrame(wx.Frame):
 
     # === Метод обновления прогресса ===
     def update_progress(self, event):
+        """
+        Обновляет прогресс-бар воспроизведения в интерфейсе.
+        Вызывается таймером каждые 0.5 секунды.
+        """
         if self.controller.is_playing and self.controller.current_track:
             percent = self.controller.get_pos()
             self.progress.SetValue(percent)

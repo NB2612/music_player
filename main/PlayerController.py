@@ -34,6 +34,7 @@ class PlayerController:
         return percent
 
     def stop(self):
+        """Остановка проигрывания"""
         mixer.music.stop()
         self.is_playing = False
         self.is_paused = False
