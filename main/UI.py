@@ -2,10 +2,10 @@ import wx
 import wx.adv
 from pygame import mixer
 
-from Composition import Composition
-from PlayList import PlayList
-from PlayerController import PlayerController
-from PlaylistJSONController import PlaylistJSONController
+from .Composition import Composition
+from .PlayList import PlayList
+from .PlayerController import PlayerController
+from .PlaylistJSONController import PlaylistJSONController
 
 class AudioPlayerFrame(wx.Frame):
     def __init__(self, parent=None, title="🎵 Audio Player", size=(600, 600)):
@@ -124,12 +124,12 @@ class AudioPlayerFrame(wx.Frame):
         # Подгружаем плейлисты из json
         for name in self.playlists:
             self.playlist_list.Append(name)
-        self.playlist_list.SetSelection(0)
-
-        # Принудительно вызвать обработчик выбора
-        event = wx.CommandEvent(wx.wxEVT_LISTBOX, self.playlist_list.GetId())
-        event.SetInt(0)
-        self.on_select_playlist(event)
+        if self.playlist_list.GetItems():
+            self.playlist_list.SetSelection(0)
+            # Принудительно вызвать обработчик выбора
+            event = wx.CommandEvent(wx.wxEVT_LISTBOX, self.playlist_list.GetId())
+            event.SetInt(0)
+            self.on_select_playlist(event)
 
         self.Centre()
         self.Show()

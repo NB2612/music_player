@@ -1,5 +1,5 @@
-from main.Composition import Composition
-from main.linked_list import LinkedList
+from .Composition import Composition
+from .linked_list import LinkedList
 
 
 class PlayList(LinkedList):
@@ -32,8 +32,6 @@ class PlayList(LinkedList):
 
         # Вызов твоей функции remove, которая обновляет связи и _head
         self.remove(composition)
-
-
 
     def next_song(self):
         if self.current_node:

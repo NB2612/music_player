@@ -1,6 +1,3 @@
-import pathlib
-
-
 class Composition:
     """Представляет музыкальную композицию."""
     def __init__(self, title: str, duration: float, path: str):
@@ -27,12 +24,21 @@ class Composition:
         return f"Composition('{self.title}', '{self.duration}', '{self.path}')"
 
     def __eq__(self, other):
-        """Поддержка оператора == для сравнения композиций."""
+        """
+        Поддержка оператора == для сравнения композиций.
+
+        Сравнение:
+        - с другой Composition: title, duration, path
+        - со строкой: title или path
+        - с числом (int или float): duration
+        """
         if isinstance(other, Composition):
-            return (self.title, self.duration, self.path) == \
-                (other.title, other.duration, other.path)
+            return (self.title, self.duration, self.path) == (other.title, other.duration, other.path)
+
         if isinstance(other, str):
             return self.title == other or self.path == other
-        if isinstance(other, float):
+
+        if isinstance(other, (int, float)):
             return self.duration == other
+
         return False
