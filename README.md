@@ -5,9 +5,9 @@
 **Технологии:**
 
 * Python 3.10+
-* wxPython (GUI)
-* pygame (воспроизведение аудио)
-* JSON (сохранение плейлистов)
+* wxPython 4.2.4 (GUI)
+* pygame 2.6.1 (воспроизведение аудио)
+* simplejson 3.20.2 (сохранение плейлистов)
 
 ---
 
@@ -49,7 +49,7 @@ AudioPlayer/
 1. Клонируйте репозиторий:
 
 ```bash
-git clone https://github.com/yourusername/audioplayer.git
+git clone https://github.com/NB2612/audioplayer.git
 cd audioplayer
 ```
 
@@ -70,8 +70,9 @@ pip install -r requirements.txt
 > **requirements.txt**:
 >
 > ```
-> wxPython
-> pygame
+> wxPython==4.2.4
+> pygame==2.6.1
+> simplejson==3.20.2
 > ```
 
 ---
@@ -81,7 +82,7 @@ pip install -r requirements.txt
 Из корня проекта выполните:
 
 ```bash
-python main.py
+python AudioPlayer.py
 ```
 
 ---
