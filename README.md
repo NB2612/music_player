@@ -60,8 +60,32 @@ python -m venv .venv
 source .venv/bin/activate   # Linux/macOS
 .venv\Scripts\activate      # Windows
 ```
+### Установка на Linux
 
-3. Установите зависимости:
+Для успешной сборки wxPython требуется установить GTK3 development файлы и библиотеки:
+
+```bash
+sudo apt update
+sudo apt install -y build-essential libgtk-3-dev libjpeg-dev libtiff-dev \
+    libpng-dev libgl1-mesa-dev libglu1-mesa-dev libgstreamer1.0-dev \
+    libgstreamer-plugins-base1.0-dev pkg-config python3-dev libwebkit2gtk-4.0-dev
+```
+
+После этого установите зависимости проекта:
+
+```bash
+pip install -r requirements.txt
+```
+
+Если сборка wxPython не проходит, можно попробовать предварительные бинарные сборки:
+
+```bash
+pip install --pre -f https://wxpython.org/Phoenix/snapshot-builds/ wxPython
+```
+
+### Установка на Windows
+
+На Windows обычно достаточно выполнить:
 
 ```bash
 pip install -r requirements.txt
@@ -74,7 +98,6 @@ pip install -r requirements.txt
 > pygame==2.6.1
 > simplejson==3.20.2
 > ```
-
 ---
 
 ## 🖥 Запуск программы
